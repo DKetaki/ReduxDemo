@@ -8,6 +8,8 @@ import { createAppContainer, createSwitchNavigator } from 'react-navigation'
 import { createStackNavigator } from 'react-navigation-stack'
 import { createBottomTabNavigator, createMaterialTopTabNavigator } from 'react-navigation-tabs'
 import { createDrawerNavigator } from 'react-navigation-drawer'
+import { createStore } from 'redux'
+import { Provider } from 'react-redux'
 
 const HomeStack = createBottomTabNavigator(
   {
@@ -30,7 +32,23 @@ const LoginStack = createSwitchNavigator(
     },
   }
 );
-export default createAppContainer (
+export const initialState = { payload: [] }
+const reducer = (state = initialState, action) => {
+  switch (action.type) {
+    case 'PLUS':
+      let addition = parseInt(action.json[action.index].counter)
+      action.json[action.index].counter = '' + ++addition
+      return { ...state, 
+        payload: action.json }
+    case 'MINUS':
+      let subtract = parseInt(action.json[action.index].counter)
+      action.json[action.index].counter = '' + --subtract
+      return { payload: action.json }
+    default: { payload: action.json }
+  }
+  return { payload: action.json }
+}
+const AppContainer = createAppContainer (
   createStackNavigator (
     {
       LoginSwitch: LoginStack,
@@ -42,6 +60,12 @@ export default createAppContainer (
    }
   )
 )
+const store = createStore(reducer)
+export default function App() {
+  return <Provider store={store}>
+    <AppContainer />
+  </Provider>
+}
 const styles = StyleSheet.create({
   container: {
     flex: 1,
